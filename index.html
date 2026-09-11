@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>W.A.N.D. Agent Application — Magical Field Operative Interview</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --bg-panel: #111827;
+    --bg-panel-2: #0d1322;
+    --ink: #e6e8ef;
+    --ink-dim: #9aa3b8;
+    --ink-faint: #5b6478;
+    --accent: #b794f4;
+    --accent-2: #7c3aed;
+    --accent-glow: rgba(183, 148, 244, 0.35);
+    --gold: #d4af37;
+    --danger: #f87171;
+    --ok: #34d399;
+    --border: #1f2a44;
+    --border-strong: #2d3a5c;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Georgia", "Times New Roman", serif;
+    min-height: 100vh;
+  }
+
+  body {
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(124, 58, 237, 0.12), transparent 38%),
+      radial-gradient(circle at 88% 82%, rgba(183, 148, 244, 0.10), transparent 42%),
+      linear-gradient(180deg, #070b15 0%, #0a0e1a 100%);
+    background-attachment: fixed;
+  }
+
+  /* ---- Layout ---- */
+  .shell {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 36px 20px 80px;
+  }
+
+  header.intro {
+    text-align: center;
+    padding: 28px 18px 22px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%);
+    box-shadow: 0 0 0 1px rgba(183, 148, 244, 0.05), 0 18px 40px -24px rgba(0,0,0,0.8);
+  }
+
+  .crest {
+    font-size: 34px;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    text-shadow: 0 0 18px var(--accent-glow);
+    margin-bottom: 6px;
+  }
+
+  .org {
+    font-variant: small-caps;
+    letter-spacing: 0.32em;
+    font-size: 13px;
+    color: var(--gold);
+    margin-top: 2px;
+  }
+
+  h1 {
+    font-family: "Georgia", serif;
+    font-weight: 400;
+    font-size: 26px;
+    margin: 10px 0 4px;
+    color: var(--ink);
+  }
+
+  .subtitle {
+    font-style: italic;
+    color: var(--ink-dim);
+    font-size: 14px;
+    margin: 0 0 16px;
+  }
+
+  .clearance {
+    display: inline-block;
+    margin-top: 4px;
+    padding: 4px 12px;
+    border: 1px dashed var(--border-strong);
+    border-radius: 4px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+
+  .briefing {
+    margin: 18px auto 0;
+    max-width: 640px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink-dim);
+    text-align: left;
+    background: rgba(0,0,0,0.25);
+    padding: 14px 18px;
+    border-left: 2px solid var(--accent-2);
+    border-radius: 0 6px 6px 0;
+  }
+
+  .briefing b { color: var(--accent); font-weight: 600; }
+
+  /* ---- Progress ---- */
+  .progress {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    margin: 22px 0 8px;
+    padding: 8px 12px;
+    background: rgba(10, 14, 26, 0.85);
+    backdrop-filter: blur(6px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--ink-dim);
+  }
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-panel-2);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    box-shadow: 0 0 12px var(--accent-glow);
+    transition: width 0.35s ease;
+  }
+  .progress-count { color: var(--accent); font-weight: 600; }
+
+  /* ---- Interview cards ---- */
+  .qa {
+    margin: 16px 0;
+    padding: 18px 18px 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-panel);
+    box-shadow: 0 10px 24px -20px rgba(0,0,0,0.8);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .qa.focused {
+    border-color: var(--accent-2);
+    box-shadow: 0 0 0 1px var(--accent-2), 0 14px 30px -22px rgba(124,58,237,0.6);
+  }
+  .qa.done { border-color: var(--border-strong); }
+
+  .q-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .q-num {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+  .q-label {
+    font-variant: small-caps;
+    letter-spacing: 0.06em;
+    font-size: 18px;
+    color: var(--ink);
+  }
+  .q-field {
+    font-family: "Courier New", monospace;
+    font-size: 10px;
+    color: var(--gold);
+    margin-left: auto;
+    letter-spacing: 0.1em;
+  }
+  .q-prompt {
+    font-style: italic;
+    color: var(--ink-dim);
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 2px 0 10px;
+  }
+
+  .qa textarea,
+  .qa input[type="text"] {
+    width: 100%;
+    background: var(--bg-panel-2);
+    color: var(--ink);
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-family: "Georgia", serif;
+    font-size: 15px;
+    line-height: 1.5;
+    resize: vertical;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .qa textarea { min-height: 72px; }
+  .qa textarea:focus,
+  .qa input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+  }
+  .qa textarea::placeholder,
+  .qa input::placeholder { color: var(--ink-faint); font-style: italic; }
+
+  .q-foot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 6px;
+    font-size: 11px;
+    color: var(--ink-faint);
+  }
+  .status-dot { color: var(--ink-faint); }
+  .status-dot.answered { color: var(--ok); }
+  .status-dot.answered::before { content: "✓ answered"; }
+  .status-dot.unanswered::before { content: "○ awaiting response"; }
+
+  .char-count.warn { color: var(--gold); }
+  .char-count.over { color: var(--danger); }
+
+  /* ---- Actions ---- */
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 26px 0 8px;
+    justify-content: center;
+  }
+  button {
+    font-family: "Georgia", serif;
+    font-size: 14px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-panel-2);
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.18s ease;
+    letter-spacing: 0.04em;
+  }
+  button:hover { border-color: var(--accent); color: var(--accent); }
+  button:active { transform: translateY(1px); }
+  button.primary {
+    background: linear-gradient(180deg, var(--accent-2), #5b21b6);
+    border-color: var(--accent-2);
+    color: #fff;
+    box-shadow: 0 8px 20px -10px var(--accent-2);
+  }
+  button.primary:hover { color: #fff; border-color: var(--accent); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ---- Output ---- */
+  .output {
+    margin-top: 28px;
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    background:
+      repeating-linear-gradient(0deg, transparent, transparent 31px, rgba(183,148,244,0.04) 31px, rgba(183,148,244,0.04) 32px),
+      var(--bg-panel);
+    padding: 24px 26px;
+    display: none;
+  }
+  .output.visible { display: block; }
+
+  .out-head {
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+  }
+  .out-head .crest { font-size: 24px; margin-bottom: 2px; }
+  .out-head h2 {
+    font-weight: 400;
+    font-size: 18px;
+    margin: 4px 0 2px;
+    font-variant: small-caps;
+    letter-spacing: 0.1em;
+  }
+  .out-head .stamp {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+
+  .out-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 22px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .out-grid .full { grid-column: 1 / -1; }
+  .out-row {
+    padding: 6px 0;
+    border-bottom: 1px dotted var(--border);
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+  }
+  .out-row .k {
+    font-variant: small-caps;
+    color: var(--accent);
+    min-width: 140px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .out-row .v {
+    color: var(--ink);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  .out-row .v.empty { color: var(--ink-faint); font-style: italic; }
+
+  .out-sentence {
+    margin-top: 18px;
+    padding: 16px 18px;
+    border: 1px solid var(--accent-2);
+    border-radius: 8px;
+    background: rgba(124, 58, 237, 0.08);
+    font-style: italic;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  .out-sentence .label {
+    display: block;
+    font-style: normal;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .out-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.08em;
+  }
+
+  /* responsive */
+  @media (max-width: 600px) {
+    .out-grid { grid-template-columns: 1fr; }
+    .out-row .k { min-width: 110px; }
+    .q-field { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <header class="intro">
+    <div class="crest">✦</div>
+    <div class="org">W.A.N.D.</div>
+    <h1>Magical Field Operative — Application Interview</h1>
+    <p class="subtitle">Bureau of Wielders, Arcanists, Necromancers &amp; Diviners</p>
+    <span class="clearance">Clearance Pending · Session Encrypted</span>
+    <div class="briefing">
+      <p style="margin:0 0 8px;"><b>Recruiter note:</b> Greetings, prospective operative. The following interview determines your suitability for field deployment within W.A.N.D. Answer each question as you would before a panel of senior agents — honestly, vividly, and in your own words.</p>
+      <p style="margin:0;">There are no wrong answers. Only <b>interesting</b> ones. Your responses will be compiled into your official Agent Quick Summary dossier upon completion.</p>
+    </div>
+  </header>
+
+  <div class="progress">
+    <span>Dossier completeness</span>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <span class="progress-count" id="progressCount">0 / 19</span>
+  </div>
+
+  <div id="interview"></div>
+
+  <div class="actions">
+    <button id="compileBtn" class="primary" disabled>Compile Agent Dossier</button>
+    <button id="resetBtn">Clear Responses</button>
+    <button id="copyBtn" style="display:none;">Copy Summary</button>
+  </div>
+
+  <div class="output" id="output"></div>
+
+  <footer>
+    W.A.N.D. Recruitment Terminal · responses stored locally in your browser only
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Field definitions: key, label, field-code, prompt, multiline, placeholder, suggested length
+  var FIELDS = [
+    { k: "Name",      label: "Name",        code: "REC-01", prompt: "State your full name as it would appear on an official W.A.N.D. warrant.", multiline: false, ph: "e.g. Mireille Vossberg" },
+    { k: "Callsign",  label: "Callsign",    code: "REC-02", prompt: "What callsign should agents use over comms when addressing you?", multiline: false, ph: "e.g. Nightjar" },
+    { k: "Pronouns",  label: "Pronouns",    code: "REC-03", prompt: "Which pronouns should appear in your personnel file?", multiline: false, ph: "e.g. she/her, they/them" },
+    { k: "Species",   label: "Species",     code: "REC-04", prompt: "State your species or lineage. Hybrids welcome; be precise.", multiline: false, ph: "e.g. Half-elf, sentient fog, revenant" },
+    { k: "Age",       label: "Age",         code: "REC-05", prompt: "How old are you — in years you have actually experienced?", multiline: false, ph: "e.g. 247 (looks 30)" },
+    { k: "Role",      label: "Role",        code: "REC-06", prompt: "What field role are you applying for within W.A.N.D.?", multiline: false, ph: "e.g. Reconnaissance Diviner" },
+    { k: "Specialty", label: "Specialty",   code: "REC-07", prompt: "Name your particular specialty within that role.", multiline: false, ph: "e.g. Post-mortem cartomancy" },
+    { k: "MagicAbilities", label: "Magic / Abilities", code: "REC-08", prompt: "Describe the magic and abilities you bring to the Bureau. Be thorough — field reports rely on accurate capability data.", multiline: true, ph: "List your powers, their limits, and how they manifest…" },
+    { k: "SignatureAbility", label: "Signature Ability", code: "REC-09", prompt: "What single ability would a target remember you by? Your signature move.", multiline: true, ph: "The one thing only you seem to do…" },
+    { k: "Weapon",   label: "Weapon",      code: "REC-10", prompt: "What is your chosen weapon or primary instrument of force?", multiline: false, ph: "e.g. A whisper-sharp rapier named 'Reproof'" },
+    { k: "CombatStyle", label: "Combat Style", code: "REC-11", prompt: "Describe how you fight. Tempo, instinct, preferred range, habits under fire.", multiline: true, ph: "How do you move when things go wrong?" },
+    { k: "Personality", label: "Personality", code: "REC-12", prompt: "How would a colleague describe your temperament after a long mission with you?", multiline: true, ph: "Your manner, your tells, your way of being…" },
+    { k: "Strength", label: "Strength",     code: "REC-13", prompt: "What is your greatest strength — the one a team would lean on in a crisis?", multiline: true, ph: "The thing you do better than anyone you know…" },
+    { k: "Flaw",     label: "Flaw",         code: "REC-14", prompt: "And your most exploitable flaw. Recruiters respect honesty; records are sealed.", multiline: true, ph: "What would an enemy use against you?" },
+    { k: "ReasonJoining", label: "Reason for Joining W.A.N.D.", code: "REC-15", prompt: "Why do you want to join the Bureau? Be candid — motivational screening is standard.", multiline: true, ph: "What drives you to this work?" },
+    { k: "UsefulBecause", label: "Useful Because", code: "REC-16", prompt: "Why should W.A.N.D. be glad to have you? What do you make possible that few others can?", multiline: true, ph: "Your value to a team…" },
+    { k: "LiabilityBecause", label: "Liability Because", code: "REC-17", prompt: "Conversely — why might W.A.N.D. hesitate? What makes you a liability?", multiline: true, ph: "Where do you break down?" },
+    { k: "InterestingDetail", label: "One Interesting Detail", code: "REC-18", prompt: "Tell us one detail about yourself that no dossier would guess.", multiline: true, ph: "Something memorable, strange, or telling…" },
+    { k: "CharacterOneSentence", label: "Character in One Sentence", code: "REC-19", prompt: "Finally — describe yourself, the operative, in a single sentence.", multiline: false, ph: "One sentence. The whole agent, distilled." }
+  ];
+
+  var STORAGE_KEY = "wand_agent_application_v1";
+  var state = loadState();
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === "object") return parsed;
+      }
+    } catch (e) {}
+    return {};
+  }
+
+  function saveState() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+  }
+
+  var interviewEl = document.getElementById("interview");
+  var progressFill = document.getElementById("progressFill");
+  var progressCount = document.getElementById("progressCount");
+  var compileBtn = document.getElementById("compileBtn");
+  var resetBtn = document.getElementById("resetBtn");
+  var copyBtn = document.getElementById("copyBtn");
+  var output = document.getElementById("output");
+
+  function buildInterview() {
+    var html = "";
+    FIELDS.forEach(function (f, i) {
+      var val = escapeHtml(state[f.k] || "");
+      var answered = !!(state[f.k] && state[f.k].trim());
+      var field = f.multiline
+        ? '<textarea id="f-' + f.k + '" data-k="' + f.k + '" placeholder="' + escapeAttr(f.ph) + '">' + val + '</textarea>'
+        : '<input type="text" id="f-' + f.k + '" data-k="' + f.k + '" placeholder="' + escapeAttr(f.ph) + '" value="' + val + '" />';
+      html +=
+        '<div class="qa' + (answered ? " done" : "") + '" id="card-' + f.k + '">' +
+          '<div class="q-head">' +
+            '<span class="q-num">Q' + (i + 1) + '</span>' +
+            '<span class="q-label">' + f.label + '</span>' +
+            '<span class="q-field">[' + f.code + ']</span>' +
+          '</div>' +
+          '<div class="q-prompt">' + f.prompt + '</div>' +
+          field +
+          '<div class="q-foot">' +
+            '<span class="status-dot ' + (answered ? "answered" : "unanswered") + '"></span>' +
+            '<span class="char-count" id="cc-' + f.k + '">' + (state[f.k] || "").length + '</span>' +
+          '</div>' +
+        '</div>';
+    });
+    interviewEl.innerHTML = html;
+    attachListeners();
+    updateProgress();
+  }
+
+  function attachListeners() {
+    var inputs = interviewEl.querySelectorAll("textarea, input");
+    inputs.forEach(function (el) {
+      el.addEventListener("input", function () {
+        var k = el.getAttribute("data-k");
+        state[k] = el.value;
+        saveState();
+
+        var card = document.getElementById("card-" + k);
+        var dot = card.querySelector(".status-dot");
+        var cc = document.getElementById("cc-" + k);
+        cc.textContent = el.value.length;
+        cc.className = "char-count" + (el.value.length > 400 ? " over" : el.value.length > 200 ? " warn" : "");
+
+        var answered = !!(el.value && el.value.trim());
+        card.classList.toggle("done", answered);
+        dot.className = "status-dot " + (answered ? "answered" : "unanswered");
+
+        updateProgress();
+      });
+      el.addEventListener("focus", function () {
+        var card = el.closest(".qa");
+        document.querySelectorAll(".qa.focused").forEach(function (c) { c.classList.remove("focused"); });
+        if (card) card.classList.add("focused");
+      });
+    });
+  }
+
+  function updateProgress() {
+    var answered = FIELDS.filter(function (f) { return !!(state[f.k] && state[f.k].trim()); }).length;
+    var pct = Math.round((answered / FIELDS.length) * 100);
+    progressFill.style.width = pct + "%";
+    progressCount.textContent = answered + " / " + FIELDS.length;
+    // Require the essentials at minimum to compile; encourage full completion.
+    var essentials = ["Name", "Callsign", "Role", "CharacterOneSentence"];
+    var ready = essentials.every(function (k) { return !!(state[k] && state[k].trim()); });
+    compileBtn.disabled = !ready;
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+  }
+  function escapeAttr(s) { return escapeHtml(s); }
+
+  function compileDossier() {
+    var rows = "";
+    FIELDS.forEach(function (f) {
+      var v = state[f.k] ? state[f.k].trim() : "";
+      var cls = "v" + (v ? "" : " empty");
+      var disp = v ? escapeHtml(v) : "— withheld —";
+      var full = (f.multiline || v.length > 60) ? " full" : "";
+      rows +=
+        '<div class="out-row' + full + '">' +
+          '<span class="k">' + f.label + ':</span>' +
+          '<span class="' + cls + '">' + disp + '</span>' +
+        '</div>';
+    });
+
+    var oneLiner = state.CharacterOneSentence ? escapeHtml(state.CharacterOneSentence.trim()) : "—";
+
+    output.innerHTML =
+      '<div class="out-head">' +
+        '<div class="crest">✦</div>' +
+        '<h2>W.A.N.D. Agent Quick Summary</h2>' +
+        '<div class="stamp">Field: ' + escapeHtml(state.Name ? state.Name.trim() : "[unidentified]") +
+        ' · Callsign: ' + escapeHtml(state.Callsign ? state.Callsign.trim() : "[none]") + '</div>' +
+      '</div>' +
+      '<div class="out-grid">' + rows + '</div>' +
+      '<div class="out-sentence">' +
+        '<span class="label">Character in One Sentence</span>' +
+        '"' + oneLiner + '"' +
+      '</div>' +
+      '<div class="out-actions">' +
+        '<button id="dlBtn">Download .txt</button>' +
+        '<button id="dlJsonBtn">Download .json</button>' +
+        '<button id="printBtn">Print / Save PDF</button>' +
+      '</div>';
+
+    output.classList.add("visible");
+    copyBtn.style.display = "inline-block";
+
+    document.getElementById("dlBtn").addEventListener("click", downloadTxt);
+    document.getElementById("dlJsonBtn").addEventListener("click", downloadJson);
+    document.getElementById("printBtn").addEventListener("click", function () { window.print(); });
+
+    output.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function plainTextSummary() {
+    var lines = [];
+    lines.push("W.A.N.D. Agent Quick Summary");
+    lines.push("============================");
+    lines.push("");
+    FIELDS.forEach(function (f) {
+      var v = state[f.k] ? state[f.k].trim() : "— withheld —";
+      lines.push(f.label + ": " + v);
+      lines.push("");
+    });
+    lines.push("Character in One Sentence:");
+    lines.push('"' + (state.CharacterOneSentence ? state.CharacterOneSentence.trim() : "—") + '"');
+    return lines.join("\n");
+  }
+
+  function downloadTxt() {
+    var blob = new Blob([plainTextSummary()], { type: "text/plain;charset=utf-8" });
+    triggerDownload(blob, "wand-agent-summary.txt");
+  }
+
+  function downloadJson() {
+    var data = {};
+    FIELDS.forEach(function (f) { data[f.k] = (state[f.k] || "").trim(); });
+    var blob = new Blob([JSON.stringify({ wandAgentSummary: data }, null, 2)], { type: "application/json;charset=utf-8" });
+    triggerDownload(blob, "wand-agent-summary.json");
+  }
+
+  function triggerDownload(blob, name) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function copySummary() {
+    var txt = plainTextSummary();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(function () {
+        flashBtn(copyBtn, "Copied!");
+      }).catch(function () { fallbackCopy(txt); });
+    } else {
+      fallbackCopy(txt);
+    }
+  }
+
+  function fallbackCopy(txt) {
+    var ta = document.createElement("textarea");
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); flashBtn(copyBtn, "Copied!"); }
+    catch (e) { flashBtn(copyBtn, "Copy failed"); }
+    document.body.removeChild(ta);
+  }
+
+  function flashBtn(btn, msg) {
+    var orig = btn.textContent;
+    btn.textContent = msg;
+    setTimeout(function () { btn.textContent = orig; }, 1600);
+  }
+
+  compileBtn.addEventListener("click", compileDossier);
+  copyBtn.addEventListener("click", copySummary);
+  resetBtn.addEventListener("click", function () {
+    if (confirm("Clear all interview responses? This cannot be undone.")) {
+      state = {};
+      saveState();
+      buildInterview();
+      output.classList.remove("visible");
+      output.innerHTML = "";
+      copyBtn.style.display = "none";
+    }
+  });
+
+  buildInterview();
+})();
+</script>
+</body>
+</html>
